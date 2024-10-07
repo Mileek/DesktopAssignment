@@ -27,17 +27,5 @@ namespace DesktopAssignment.ViewModels
 {
     public class ShellViewModel : Screen
     {
-		private string test = "Testowa wiadomość";
-
-		public string Test
-		{
-			get { return test; }
-			set 
-			{ 
-				test = value; 
-				NotifyOfPropertyChange(() => Test);
-            }
-		}
-
 	}
 }
