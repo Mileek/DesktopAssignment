@@ -1,6 +1,11 @@
 ﻿using Caliburn.Micro;
+using DesktopAssignment.Data;
+using DesktopAssignment.Models;
+using DesktopAssignment.Services;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,5 +32,61 @@ namespace DesktopAssignment.ViewModels
 {
     public class ShellViewModel : Screen
     {
-	}
+        private string ipAddressOrUrl;
+        private string apiKey;
+        private ObservableCollection<GeolocationModel> geolocations;
+        private readonly GeolocationDbContext dbContext;
+        private GeolocationService geolocationService;
+
+        public ShellViewModel()
+        {
+            IpAddressOrUrl = "134.201.250.155";
+            dbContext = new GeolocationDbContext();
+            Geolocations = new ObservableCollection<GeolocationModel>(dbContext.Geolocations.ToList());
+        }
+
+        public string IpAddressOrUrl
+        {
+            get { return ipAddressOrUrl; }
+            set
+            {
+                ipAddressOrUrl = value;
+                NotifyOfPropertyChange(() => IpAddressOrUrl);
+            }
+        }
+
+        public string ApiKey
+        {
+            get { return apiKey; }
+            set
+            {
+                apiKey = value;
+                NotifyOfPropertyChange(() => ApiKey);
+                geolocationService = new GeolocationService(apiKey);
+            }
+        }
+
+        public ObservableCollection<GeolocationModel> Geolocations
+        {
+            get { return geolocations; }
+            set
+            {
+                geolocations = value;
+                NotifyOfPropertyChange(() => Geolocations);
+            }
+        }
+
+        public async Task AddGeolocation()
+        {
+            if (geolocationService == null)
+            {
+                throw new InvalidOperationException("API key is not set.");
+            }
+
+            var geolocation = await geolocationService.GetGeolocationDataAsync(IpAddressOrUrl);
+            dbContext.Geolocations.Add(geolocation);
+            await dbContext.SaveChangesAsync();
+            Geolocations.Add(geolocation);
+        }
+    }
 }
