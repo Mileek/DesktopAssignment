@@ -1,16 +1,19 @@
 ﻿using DesktopAssignment.Models;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace DesktopAssignment.Data
 {
     public class GeolocationDbContext : DbContext
     {
-        public DbSet<GeolocationModel> Geolocations { get; set; }
+        public DbSet<GeolocationModel> Geolocation { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //InMemory database for testing purposes
-            optionsBuilder.UseInMemoryDatabase("GeolocationDb");
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var databasePath = Path.Combine(baseDirectory, "geolocation.db");
+
+            optionsBuilder.UseSqlite($"Data Source={databasePath}");
         }
     }
 }

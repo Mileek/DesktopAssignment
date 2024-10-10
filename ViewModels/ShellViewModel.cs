@@ -2,6 +2,7 @@
 using DesktopAssignment.Data;
 using DesktopAssignment.Models;
 using DesktopAssignment.Services;
+using DesktopAssignment.Views;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 /*
  Summary
 The aim of this task is to build a desktop application (backed by any kind of database). The application should be able to store geolocation data in the database, based on IP address or URL - you can use https://ipstack.com/ to get geolocation data. The application should be able to add, delete or provide geolocation data on the base of ip address or URL. 
@@ -42,7 +44,7 @@ namespace DesktopAssignment.ViewModels
         {
             IpAddressOrUrl = "134.201.250.155";
             dbContext = new GeolocationDbContext();
-            Geolocations = new ObservableCollection<GeolocationModel>(dbContext.Geolocations.ToList());
+            Geolocations = new ObservableCollection<GeolocationModel>(/*dbContext.Geolocation.ToList()*/);
         }
 
         public string IpAddressOrUrl
@@ -80,24 +82,63 @@ namespace DesktopAssignment.ViewModels
         {
             if (geolocationService == null)
             {
-                throw new InvalidOperationException("API key is not set.");
+                ShowWarning("Cannot connect with web API, the service may be down or your API Key may not be valid. Try again later.");
+                return;
+            }
+            if (string.IsNullOrEmpty(ApiKey))
+            {
+                ShowWarning("API Key cannot be empty. Please provide a valid API Key.");
+                return;
             }
 
             var geolocation = await geolocationService.GetGeolocationDataAsync(IpAddressOrUrl);
-            dbContext.Geolocations.Add(geolocation);
+            dbContext.Geolocation.Add(geolocation);
             await dbContext.SaveChangesAsync();
             Geolocations.Add(geolocation);
         }
 
         public async Task ReadGeolocation()
         {
-            var geolocationsFromDb = await Task.Run(() => dbContext.Geolocations.ToList());
+            Geolocations.Clear();
+
+            var geolocationsFromDb = await Task.Run(() => dbContext.Geolocation.ToList());
 
             foreach (var geolocation in geolocationsFromDb)
             {
                 Geolocations.Add(geolocation);
                 await Task.Delay(100); //Small delay to simulate processing time
             }
+        }
+
+        public async Task DeleteItem(GeolocationModel geolocationModel)
+        {   
+            if (geolocationModel != null)
+            {
+                Geolocations.Remove(geolocationModel);
+                dbContext.Geolocation.Remove(geolocationModel);
+                await dbContext.SaveChangesAsync();
+                Geolocations.Remove(geolocationModel);
+            }
+        }
+
+        public async Task RemoveAll()
+        {
+            var confirmationDialog = new ConfirmationDialog();
+            confirmationDialog.Owner = Application.Current.MainWindow;
+            confirmationDialog.ShowDialog();
+
+            if (confirmationDialog.IsConfirmed)
+            {
+                dbContext.Geolocation.RemoveRange(dbContext.Geolocation);
+                await dbContext.SaveChangesAsync();
+                Geolocations.Clear();
+            }
+        }
+        public void ShowWarning(string warningMessage)
+        {
+            var warningDialog = new WarningDialog(warningMessage);
+            warningDialog.Owner = Application.Current.MainWindow;
+            warningDialog.ShowDialog();
         }
     }
 }

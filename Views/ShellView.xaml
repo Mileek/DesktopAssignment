@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:DesktopAssignment.Views"
         xmlns:cal="http://www.caliburnproject.org"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        
         Style="{StaticResource MaterialDesignWindow}"
+        ResizeMode="CanMinimize"
         mc:Ignorable="d"
-        Title="ShellView" Height="450" Width="800">
+        Title="ShellView" Height="600" Width="1300">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,26 +17,74 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="http://api.ipstack.com/" IsEnabled="False"></TextBlock>
-            <TextBlock Text="{Binding IpAddressOrUrl}" IsEnabled="False"></TextBlock>
+            <Border BorderBrush="MediumPurple" BorderThickness="0,0,0,1">
+                <TextBlock Text="http://api.ipstack.com/" IsEnabled="False" 
+           Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+            </Border>
+            <Border BorderBrush="MediumPurple" BorderThickness="0,0,0,1">
+                <TextBlock Text="{Binding IpAddressOrUrl}" IsEnabled="False" 
+           Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+            </Border>
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBox Width="200" Margin="10" Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Content="Add Geolocation" cal:Message.Attach="[Click] = [AddGeolocation]" Width="200" Margin="10"/>
-            <Button Content="Read Existing" cal:Message.Attach="[Click] = [ReadGeolocation]" Width="200" Margin="10"/>
+            <TextBox Width="400" Margin="10" Style="{StaticResource MaterialDesignOutlinedTextBox}" Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Enter API Key Here"/>
+            <Button  cal:Message.Attach="[Click] = [AddGeolocation]" Style="{StaticResource MaterialDesignRaisedButton}" Width="200" >
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Plus" Margin="0,0,10,0"/>
+                        <TextBlock Text="Add Geolocation"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button cal:Message.Attach="[Click] = [ReadGeolocation]" Style="{StaticResource MaterialDesignRaisedButton}" Width="200" Margin="10">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Database" Margin="0,0,10,0"/>
+                        <TextBlock Text="Read Existing"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Margin="30,10,10,10" cal:Message.Attach="[Click] = [RemoveAll]" Style="{StaticResource MaterialDesignRaisedButton}" Background="DarkRed" Width="200">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Delete" Margin="0,0,10,0"/>
+                        <TextBlock Text="Delete Existing"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
         </StackPanel>
         <DataGrid Grid.Row="2" ItemsSource="{Binding Geolocations}" AutoGenerateColumns="False" Margin="10" 
-               materialDesign:DataGridAssist.CellPadding="8" materialDesign:DataGridAssist.ColumnHeaderPadding="8">
+               materialDesign:DataGridAssist.CellPadding="8" materialDesign:DataGridAssist.ColumnHeaderPadding="8" IsReadOnly="True" CanUserAddRows="False">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"/>
+                </Style>
+                <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="IP" Binding="{Binding Ip}" />
-                <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
-                <DataGridTextColumn Header="Continent" Binding="{Binding ContinentName}" />
-                <DataGridTextColumn Header="Country" Binding="{Binding CountryName}" />
-                <DataGridTextColumn Header="Region" Binding="{Binding RegionName}" />
-                <DataGridTextColumn Header="City" Binding="{Binding City}" />
-                <DataGridTextColumn Header="Zip" Binding="{Binding Zip}" />
-                <DataGridTextColumn Header="Latitude" Binding="{Binding Latitude}" />
-                <DataGridTextColumn Header="Longitude" Binding="{Binding Longitude}" />
+                <!--Id is just added to show that correst rows are being removed-->
+                <DataGridTextColumn Width="100" Header="ID" Binding="{Binding Id}" />
+                <DataGridTextColumn Width="120" Header="IP" Binding="{Binding Ip}" />
+                <DataGridTextColumn Width="80" Header="Type" Binding="{Binding Type}" />
+                <DataGridTextColumn Width="120" Header="Continent" Binding="{Binding ContinentName}" />
+                <DataGridTextColumn Width="120" Header="Country" Binding="{Binding CountryName}" />
+                <DataGridTextColumn Width="100" Header="Region" Binding="{Binding RegionName}" />
+                <DataGridTextColumn Width="120" Header="City" Binding="{Binding City}" />
+                <DataGridTextColumn Width="80" Header="Zip" Binding="{Binding Zip}" />
+                <DataGridTextColumn Width="150" Header="Latitude" Binding="{Binding Latitude}" />
+                <DataGridTextColumn Width="150" Header="Longitude" Binding="{Binding Longitude}" />
+                <DataGridTemplateColumn Header="Actions">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Width="50" Content="X" cal:Message.Attach="[Click]=[DeleteItem($dataContext)]" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
