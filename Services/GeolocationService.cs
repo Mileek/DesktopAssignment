@@ -19,8 +19,23 @@ namespace DesktopAssignment.Services
         {
             var url = $"http://api.ipstack.com/{ipAddressOrUrl}?access_key={_apiKey}";
             var response = await _httpClient.GetStringAsync(url);
-            var geolocation = JsonSerializer.Deserialize<GeolocationModel>(response);
-            return geolocation;
+            var geolocationResponse = JsonSerializer.Deserialize<GeolocationResponseDTO>(response);
+
+            // Map the DTO to the GeolocationModel
+            var geolocationModel = new GeolocationModel
+            {
+                Ip = geolocationResponse.Ip,
+                Type = geolocationResponse.Type,
+                ContinentName = geolocationResponse.ContinentName,
+                CountryName = geolocationResponse.CountryName,
+                RegionName = geolocationResponse.RegionName,
+                City = geolocationResponse.City,
+                Zip = geolocationResponse.Zip,
+                Latitude = geolocationResponse.Latitude,
+                Longitude = geolocationResponse.Longitude
+            };
+
+            return geolocationModel;
         }
     }
 }

@@ -88,5 +88,16 @@ namespace DesktopAssignment.ViewModels
             await dbContext.SaveChangesAsync();
             Geolocations.Add(geolocation);
         }
+
+        public async Task ReadGeolocation()
+        {
+            var geolocationsFromDb = await Task.Run(() => dbContext.Geolocations.ToList());
+
+            foreach (var geolocation in geolocationsFromDb)
+            {
+                Geolocations.Add(geolocation);
+                await Task.Delay(100); //Small delay to simulate processing time
+            }
+        }
     }
 }

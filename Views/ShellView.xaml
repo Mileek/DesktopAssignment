@@ -4,23 +4,40 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DesktopAssignment.Views"
-         xmlns:cal="http://www.caliburnproject.org"
+        xmlns:cal="http://www.caliburnproject.org"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        
+        Style="{StaticResource MaterialDesignWindow}"
         mc:Ignorable="d"
         Title="ShellView" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock  Text="http://api.ipstack.com/" IsEnabled="False"></TextBlock>
-            <TextBlock  Text="{Binding IpAddressOrUrl}" IsEnabled="False"></TextBlock>
+            <TextBlock Text="http://api.ipstack.com/" IsEnabled="False"></TextBlock>
+            <TextBlock Text="{Binding IpAddressOrUrl}" IsEnabled="False"></TextBlock>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.RowSpan="2">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBox Width="200" Margin="10" Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}" />
             <Button Content="Add Geolocation" cal:Message.Attach="[Click] = [AddGeolocation]" Width="200" Margin="10"/>
-            <ListBox ItemsSource="{Binding Geolocations}" DisplayMemberPath="IpAddressOrUrl" Width="200" Margin="10"/>
+            <Button Content="Read Existing" cal:Message.Attach="[Click] = [ReadGeolocation]" Width="200" Margin="10"/>
         </StackPanel>
+        <DataGrid Grid.Row="2" ItemsSource="{Binding Geolocations}" AutoGenerateColumns="False" Margin="10" 
+               materialDesign:DataGridAssist.CellPadding="8" materialDesign:DataGridAssist.ColumnHeaderPadding="8">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="IP" Binding="{Binding Ip}" />
+                <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
+                <DataGridTextColumn Header="Continent" Binding="{Binding ContinentName}" />
+                <DataGridTextColumn Header="Country" Binding="{Binding CountryName}" />
+                <DataGridTextColumn Header="Region" Binding="{Binding RegionName}" />
+                <DataGridTextColumn Header="City" Binding="{Binding City}" />
+                <DataGridTextColumn Header="Zip" Binding="{Binding Zip}" />
+                <DataGridTextColumn Header="Latitude" Binding="{Binding Latitude}" />
+                <DataGridTextColumn Header="Longitude" Binding="{Binding Longitude}" />
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
