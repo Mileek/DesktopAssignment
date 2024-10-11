@@ -2,15 +2,8 @@
 using DesktopAssignment.Data;
 using DesktopAssignment.Models;
 using DesktopAssignment.Services;
-using DesktopAssignment.Views;
-using Microsoft.EntityFrameworkCore.Metadata;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+
 /*
  Summary
 The aim of this task is to build a desktop application (backed by any kind of database). The application should be able to store geolocation data in the database, based on IP address or URL - you can use https://ipstack.com/ to get geolocation data. The application should be able to add, delete or provide geolocation data on the base of ip address or URL. 
@@ -34,19 +27,21 @@ namespace DesktopAssignment.ViewModels
 {
     public class ShellViewModel : Screen
     {
+        private const string DEFAULT_IP_ADDRESS = "134.201.250.155";
         private string ipAddressOrUrl;
         private string apiKey;
         private ObservableCollection<GeolocationModel> geolocations;
         private readonly GeolocationDbContext dbContext;
-        private GeolocationService geolocationService;
-        private readonly IWindowManager windowManager;
+        private readonly IWindowManager _windowManager;
+        IGeolocationService _geolocationService;
 
-        public ShellViewModel(IWindowManager windowManager)
+        public ShellViewModel(IWindowManager windowManager, IGeolocationService geolocationService, GeolocationDbContext dbContext)
         {
-            this.windowManager = windowManager;
-            IpAddressOrUrl = "134.201.250.155";
-            dbContext = new GeolocationDbContext();
-            Geolocations = new ObservableCollection<GeolocationModel>(/*dbContext.Geolocation.ToList()*/);
+            _geolocationService = geolocationService;
+            _windowManager = windowManager;
+            IpAddressOrUrl = DEFAULT_IP_ADDRESS;
+            this.dbContext = dbContext;
+            Geolocations = new ObservableCollection<GeolocationModel>();
         }
 
         public string IpAddressOrUrl
@@ -66,7 +61,7 @@ namespace DesktopAssignment.ViewModels
             {
                 apiKey = value;
                 NotifyOfPropertyChange(() => ApiKey);
-                geolocationService = new GeolocationService(apiKey);
+                _geolocationService.SetApiKey(apiKey);
             }
         }
 
@@ -82,21 +77,29 @@ namespace DesktopAssignment.ViewModels
 
         public async Task AddGeolocation()
         {
-            if (geolocationService == null)
+            try
             {
-                ShowWarning("Cannot connect with web API, the service may be down or your API Key may not be valid. Try again later.");
-                return;
-            }
-            if (string.IsNullOrEmpty(ApiKey))
-            {
-                ShowWarning("API Key cannot be empty. Please provide a valid API Key.");
-                return;
-            }
+                if (_geolocationService == null)
+                {
+                    await ShowWarning("Cannot connect with web API, the service may be down or your API Key may not be valid. Try again later.");
+                    return;
+                }
+                if (string.IsNullOrEmpty(ApiKey))
+                {
+                    await ShowWarning("API Key cannot be empty. Please provide a valid API Key.");
+                    return;
+                }
 
-            var geolocation = await geolocationService.GetGeolocationDataAsync(IpAddressOrUrl);
-            dbContext.Geolocation.Add(geolocation);
-            await dbContext.SaveChangesAsync();
-            Geolocations.Add(geolocation);
+                var geolocation = await _geolocationService.GetGeolocationDataAsync(IpAddressOrUrl);
+                dbContext.Geolocation.Add(geolocation);
+                await dbContext.SaveChangesAsync();
+                Geolocations.Add(geolocation);
+            }
+            catch (Exception ex)
+            {
+                //Apologize for no NLog implementation
+                await ShowWarning($"An error occurred: {ex.Message}");
+            }
         }
 
         public async Task ReadGeolocation()
@@ -119,14 +122,13 @@ namespace DesktopAssignment.ViewModels
                 Geolocations.Remove(geolocationModel);
                 dbContext.Geolocation.Remove(geolocationModel);
                 await dbContext.SaveChangesAsync();
-                Geolocations.Remove(geolocationModel);
             }
         }
 
         public async Task RemoveAll()
         {
             var confirmationDialogViewModel = new ConfirmationDialogViewModel();
-            var result = await windowManager.ShowDialogAsync(confirmationDialogViewModel);
+            var result = await _windowManager.ShowDialogAsync(confirmationDialogViewModel);
 
             if (result == true && confirmationDialogViewModel.IsConfirmed)
             {
@@ -139,7 +141,7 @@ namespace DesktopAssignment.ViewModels
         public async Task ShowWarning(string warningMessage)
         {
             var warningDialog = new WarningDialogViewModel(warningMessage);
-            await windowManager.ShowDialogAsync(warningDialog);
+            await _windowManager.ShowDialogAsync(warningDialog);
         }
     }
 }

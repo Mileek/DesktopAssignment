@@ -1,6 +1,5 @@
 ﻿using DesktopAssignment.Models;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 
 namespace DesktopAssignment.Data
 {
@@ -8,12 +7,9 @@ namespace DesktopAssignment.Data
     {
         public DbSet<GeolocationModel> Geolocation { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public GeolocationDbContext(DbContextOptions<GeolocationDbContext> options)
+        : base(options)
         {
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            var databasePath = Path.Combine(baseDirectory, "geolocation.db");
-
-            optionsBuilder.UseSqlite($"Data Source={databasePath}");
         }
     }
 }

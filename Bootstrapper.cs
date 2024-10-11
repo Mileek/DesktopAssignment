@@ -1,5 +1,8 @@
 ﻿using Caliburn.Micro;
+using DesktopAssignment.Data;
+using DesktopAssignment.Services;
 using DesktopAssignment.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace DesktopAssignment
 {
@@ -18,7 +21,15 @@ namespace DesktopAssignment
             container = new SimpleContainer();
             //Register services
             container.Singleton<IWindowManager, WindowManager>();
-            container.Singleton<IEventAggregator, EventAggregator>();
+            container.Singleton<IGeolocationService, GeolocationService>();
+
+            // DbContext with options
+            var options = new DbContextOptionsBuilder<GeolocationDbContext>()
+                .UseSqlite($"Data Source={System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "geolocation.db")}")
+                .Options;
+            container.Instance(options);
+            container.Singleton<GeolocationDbContext>();
+
             container.PerRequest<ShellViewModel>();
         }
 
