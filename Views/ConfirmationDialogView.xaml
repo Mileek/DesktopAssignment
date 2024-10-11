@@ -1,0 +1,17 @@
+﻿<Window x:Class="DesktopAssignment.Views.ConfirmationDialogView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:cal="http://www.caliburnproject.org"
+        Style="{StaticResource MaterialDesignWindow}"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Title="Confirmation" Height="200" Width="400">
+    <StackPanel Margin="20">
+        <TextBlock Text="Are you sure?" Style="{StaticResource MaterialDesignBody1TextBlock}" Margin="0,0,0,20"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Yes" Width="75" Margin="0,0,10,0" IsDefault="True" cal:Message.Attach="[Click]=[Confirm]" />
+            <Button Content="No" Width="75" IsCancel="True" cal:Message.Attach="[Click]=[Decline]"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -39,9 +39,11 @@ namespace DesktopAssignment.ViewModels
         private ObservableCollection<GeolocationModel> geolocations;
         private readonly GeolocationDbContext dbContext;
         private GeolocationService geolocationService;
+        private readonly IWindowManager windowManager;
 
-        public ShellViewModel()
+        public ShellViewModel(IWindowManager windowManager)
         {
+            this.windowManager = windowManager;
             IpAddressOrUrl = "134.201.250.155";
             dbContext = new GeolocationDbContext();
             Geolocations = new ObservableCollection<GeolocationModel>(/*dbContext.Geolocation.ToList()*/);
@@ -123,22 +125,21 @@ namespace DesktopAssignment.ViewModels
 
         public async Task RemoveAll()
         {
-            var confirmationDialog = new ConfirmationDialog();
-            confirmationDialog.Owner = Application.Current.MainWindow;
-            confirmationDialog.ShowDialog();
+            var confirmationDialogViewModel = new ConfirmationDialogViewModel();
+            var result = await windowManager.ShowDialogAsync(confirmationDialogViewModel);
 
-            if (confirmationDialog.IsConfirmed)
+            if (result == true && confirmationDialogViewModel.IsConfirmed)
             {
                 dbContext.Geolocation.RemoveRange(dbContext.Geolocation);
                 await dbContext.SaveChangesAsync();
                 Geolocations.Clear();
             }
         }
-        public void ShowWarning(string warningMessage)
+
+        public async Task ShowWarning(string warningMessage)
         {
-            var warningDialog = new WarningDialog(warningMessage);
-            warningDialog.Owner = Application.Current.MainWindow;
-            warningDialog.ShowDialog();
+            var warningDialog = new WarningDialogViewModel(warningMessage);
+            await windowManager.ShowDialogAsync(warningDialog);
         }
     }
 }
