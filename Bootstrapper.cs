@@ -22,6 +22,7 @@ namespace DesktopAssignment
             //Register services
             container.Singleton<IWindowManager, WindowManager>();
             container.Singleton<IGeolocationService, GeolocationService>();
+            container.Singleton<IDatabaseService, DatabaseService>();
 
             // DbContext with options
             var options = new DbContextOptionsBuilder<GeolocationDbContext>()

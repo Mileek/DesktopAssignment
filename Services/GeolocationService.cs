@@ -47,9 +47,15 @@ namespace DesktopAssignment.Services
 
                 return geolocationModel;
             }
-            catch (Exception ex)
+            catch (JsonException jsonEx)
             {
                 //Apologize for no NLog implementation
+                //JSON deserialization exceptions
+                throw new Exception("Invalid API Key or response format. Please check your API Key and try again.");
+            }
+            catch (Exception ex)
+            {
+                
                 throw new Exception($"Failed to get geolocation data: {ex.Message}");
             }
         }

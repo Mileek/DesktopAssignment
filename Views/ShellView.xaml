@@ -28,7 +28,7 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBox Width="400" Margin="10" Style="{StaticResource MaterialDesignOutlinedTextBox}" Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Enter API Key Here"/>
-            <Button  cal:Message.Attach="[Click] = [AddGeolocation]" Style="{StaticResource MaterialDesignRaisedButton}" Width="200" >
+            <Button  cal:Message.Attach="[Click] = [AddGeolocationAsync]" Style="{StaticResource MaterialDesignRaisedButton}" Width="200" >
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Plus" Margin="0,0,10,0"/>
@@ -36,7 +36,7 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-            <Button cal:Message.Attach="[Click] = [ReadGeolocation]" Style="{StaticResource MaterialDesignRaisedButton}" Width="200" Margin="10">
+            <Button cal:Message.Attach="[Click] = [ReadGeolocationAsync]" Style="{StaticResource MaterialDesignRaisedButton}" Width="200" Margin="10">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Database" Margin="0,0,10,0"/>
@@ -44,7 +44,7 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-            <Button Margin="30,10,10,10" cal:Message.Attach="[Click] = [RemoveAll]" Style="{StaticResource MaterialDesignRaisedButton}" Background="DarkRed" Width="200">
+            <Button Margin="30,10,10,10" cal:Message.Attach="[Click] = [RemoveAllAsync]" Style="{StaticResource MaterialDesignRaisedButton}" Background="DarkRed" Width="200">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Delete" Margin="0,0,10,0"/>
@@ -81,7 +81,7 @@
                 <DataGridTemplateColumn Header="Actions">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Width="50" Content="X" cal:Message.Attach="[Click]=[DeleteItem($dataContext)]" />
+                            <Button Width="50" Content="X" cal:Message.Attach="[Click]=[DeleteItemAsync($dataContext)]" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
