@@ -59,7 +59,7 @@ namespace DesktopAssignment.ViewModels
         private readonly IWindowManager _windowManager;
         private readonly GeolocationDbContext dbContext;
         private IGeolocationService _geolocationService;
-        private string apiKey;
+        private string apiKey = string.Empty;
         private ObservableCollection<GeolocationModel> geolocations = new ObservableCollection<GeolocationModel>();
         private string ipAddressOrUrl = DEFAULT_IP_ADDRESS;
 

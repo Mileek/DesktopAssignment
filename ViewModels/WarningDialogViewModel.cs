@@ -18,7 +18,7 @@ namespace DesktopAssignment.ViewModels
 
         public WarningDialogViewModel(string warningMessage)
         {
-            WarningMessage = warningMessage;
+            this.warningMessage = warningMessage;
         }
 
         public async Task Ok()

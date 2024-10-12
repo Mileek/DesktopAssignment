@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DesktopAssignment.Tests\**" />
+    <EmbeddedResource Remove="DesktopAssignment.Tests\**" />
+    <None Remove="DesktopAssignment.Tests\**" />
+    <Page Remove="DesktopAssignment.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Caliburn.Micro" Version="4.0.212" />
     <PackageReference Include="MaterialDesignColors" Version="3.1.0">
       <TreatAsUsed>true</TreatAsUsed>

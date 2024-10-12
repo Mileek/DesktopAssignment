@@ -8,7 +8,7 @@ namespace DesktopAssignment
 {
     public class Bootstrapper : BootstrapperBase
     {
-        private SimpleContainer container;
+        private SimpleContainer container = null!;
 
         public Bootstrapper()
         {
