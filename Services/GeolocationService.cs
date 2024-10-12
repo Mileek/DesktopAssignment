@@ -70,6 +70,10 @@ namespace DesktopAssignment.Services
             {
                 throw new Exception("Invalid response format it may be caused by API Key, IP address, URL. Please check it and try again.");
             }
+            catch (HttpRequestException)
+            {
+                throw new Exception("Unable to connect to the geolocation service. This may be due to no Wi-Fi connection or the API service being offline.");
+            }
             catch (Exception ex)
             {
                 throw new Exception($"Failed to get geolocation data: {ex.Message}");
