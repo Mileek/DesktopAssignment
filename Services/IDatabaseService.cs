@@ -2,6 +2,6 @@
 {
     public interface IDatabaseService
     {
-        Task EnsureDatabaseExists();
+        Task EnsureDatabaseExistsAsync();
     }
 }

@@ -26,12 +26,35 @@ We will test the behavior of the system under various "unfortunate" conditions (
 After we finish reviewing the solution, we'll invite you to Sofomo's office (or to a Zoom call) for a short discussion about the provided solution. We may also use that as an opportunity to ask questions and drill into the details of your implementation.
  */
 
+/*
+ Hi,
+
+I would like to provide some context before we start the task. I Used .NET8 instead of .NET Framework. I have decided to use the following technologies and frameworks for this project:
+
+1. **MVVM Framework**: Caliburn.Micro
+2. **Database Provider**: SQLite
+3. **UI Framework**: Material Design
+4. **Testing Framework**: XUnit and Moq
+5. **Object-Relational Mapping**: Entity Framework Core
+6. **Dependency Injection**: SimpleContainer class provided by Caliburn.Micro
+
+Areas for potential improvement:
+1. I have not implemented a logging system (e.g., NLog).
+2. Validation could be improved using regex.
+3. I have not implemented a translation manager for the UI; all strings are hardcoded.
+4. I could have used AutoFac for better dependency injection handling.
+5. I should have used pull requests and feature branches instead of committing directly to the master branch.
+
+Thank you.
+ */
+
 namespace DesktopAssignment.ViewModels
 {
     public class ShellViewModel : Screen
     {
-        //IP address is specified, so i am not validating it further
+        //Default IP address, may work as a Tip
         private const string DEFAULT_IP_ADDRESS = "134.201.250.155";
+
         private readonly IDatabaseService _databaseService;
         private readonly IWindowManager _windowManager;
         private readonly GeolocationDbContext dbContext;
@@ -78,6 +101,7 @@ namespace DesktopAssignment.ViewModels
                 NotifyOfPropertyChange(() => IpAddressOrUrl);
             }
         }
+
         /// <summary>
         /// Add geolocation data to the database
         /// </summary>
@@ -90,7 +114,7 @@ namespace DesktopAssignment.ViewModels
                 {
                     return;
                 }
-                await _databaseService.EnsureDatabaseExists();
+                await _databaseService.EnsureDatabaseExistsAsync();
                 var geolocation = await _geolocationService.GetGeolocationDataAsync(IpAddressOrUrl);
                 dbContext.Geolocation.Add(geolocation);
                 await dbContext.SaveChangesAsync();
@@ -114,7 +138,7 @@ namespace DesktopAssignment.ViewModels
             {
                 if (geolocationModel != null)
                 {
-                    await _databaseService.EnsureDatabaseExists();
+                    await _databaseService.EnsureDatabaseExistsAsync();
                     Geolocations.Remove(geolocationModel);
                     dbContext.Geolocation.Remove(geolocationModel);
                     await dbContext.SaveChangesAsync();
@@ -136,7 +160,7 @@ namespace DesktopAssignment.ViewModels
             try
             {
                 Geolocations.Clear();
-                await _databaseService.EnsureDatabaseExists();
+                await _databaseService.EnsureDatabaseExistsAsync();
                 var geolocationsFromDb = await Task.Run(() => dbContext.Geolocation.ToList());
                 if (geolocationsFromDb.Count == 0)
                 {
@@ -147,7 +171,7 @@ namespace DesktopAssignment.ViewModels
                 foreach (var geolocation in geolocationsFromDb)
                 {
                     Geolocations.Add(geolocation);
-                    await Task.Delay(100); //Small delay to simulate processing time
+                    await Task.Delay(50); //Small delay to improve user experience
                 }
             }
             catch (Exception ex)
@@ -156,7 +180,6 @@ namespace DesktopAssignment.ViewModels
                 await HandleDbExceptionAsync(ex, $"An unexpected error occurred:");
             }
         }
-
 
         /// <summary>
         /// Remove all geolocation data from the database
@@ -187,6 +210,24 @@ namespace DesktopAssignment.ViewModels
         }
 
         /// <summary>
+        /// Handles database-related exceptions and displays a warning dialog with a custom message.
+        /// </summary>
+        /// <param name="ex">The exception that was thrown.</param>
+        /// <param name="customMessage">The custom message to display in the warning dialog.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task HandleDbExceptionAsync(Exception ex, string customMessage)
+        {
+            if (ex is DbUpdateException || ex is DbException)
+            {
+                await ShowWarningAsync($"{customMessage}: {ex.Message}");
+            }
+            else
+            {
+                await ShowWarningAsync($"An unexpected error occurred: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Validates the geolocation service by checking if the service instance is available and if the API key is set.
         /// </summary>
         /// <returns>Returns true if the geolocation service is valid; otherwise, false.</returns>
@@ -204,24 +245,6 @@ namespace DesktopAssignment.ViewModels
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Handles database-related exceptions and displays a warning dialog with a custom message.
-        /// </summary>
-        /// <param name="ex">The exception that was thrown.</param>
-        /// <param name="customMessage">The custom message to display in the warning dialog.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task HandleDbExceptionAsync(Exception ex, string customMessage)
-        {
-            if (ex is DbUpdateException || ex is DbException)
-            {
-                await ShowWarningAsync($"{customMessage}: {ex.Message}");
-            }
-            else
-            {
-                await ShowWarningAsync($"An unexpected error occurred: {ex.Message}");
-            }
         }
     }
 }

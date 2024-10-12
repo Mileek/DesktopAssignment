@@ -12,7 +12,12 @@ namespace DesktopAssignment.Services
             _dbContext = dbContext;
         }
 
-        public async Task EnsureDatabaseExists()
+        /// <summary>
+        /// Ensures that the database for the context exists. If it exists, no action is taken.
+        /// If it does not exist, then the database and all its schema are created.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task EnsureDatabaseExistsAsync()
         {
             await _dbContext.Database.MigrateAsync();
         }
